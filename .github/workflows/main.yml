@@ -19,4 +19,4 @@ jobs:
           server: ftp.inplayo.com
           username: u909986447.demo
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /js/canvas-parts
+          server-dir: /js/canvas-parts/
