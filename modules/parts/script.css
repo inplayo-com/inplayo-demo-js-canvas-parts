@@ -1,0 +1,44 @@
+.demo {
+    display: flex;
+}
+
+.blocks__matrix {
+    --block-cell-size: 24px;
+    --gap-between-blocks: 6px;
+    --block-color: #42727E;
+    --block-active-color: #eee;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding: 12px;
+    background-color: var(--block-color);
+}
+
+.blocks {
+    position: relative;
+    display: grid;
+
+    grid-gap: var(--gap-between-blocks);
+    transform: scaleY(-1);
+}
+
+.blocks__item {
+    border: 1px solid var(--block-active-color);
+
+    --col-start: calc(var(--x) + 1);
+    grid-column: var(--col-start) / calc(var(--col-start) + var(--w));
+
+    --row-start: calc(var(--y) + 1);
+    grid-row: var(--row-start) / calc(var(--row-start) + var(--h));
+
+    width: calc(var(--w) * var(--block-cell-size));
+    height: calc(var(--h) * var(--block-cell-size));
+}
+
+.blocks__item:hover {
+    cursor: pointer;
+}
+.blocks__item.active {
+    background: var(--block-active-color);
+}

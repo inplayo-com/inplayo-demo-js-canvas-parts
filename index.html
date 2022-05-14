@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas 2D Parts</title>
+</head>
+
+<body>
+    <h1>Canvas parts</h1>
+
+    <h2>Part configuration</h2>
+    <div>
+        <p>part should describe each item of 2d mesh that should be drawn, using params:</p>
+        <ul>
+            <li><strong>x</strong> - top coordinate of part</li>
+            <li><strong>y</strong> - left coordinate of part</li>
+            <li><strong>width</strong> - width of part</li>
+            <li><strong>height</strong> - height of part</li>
+        </ul>
+        <p>Sizes: dimensions are calculating in <strong>points</strong>, a <strong>point</strong> is natural number
+            greater or equals to 0</p>
+        <p>Format: element data should be described in json format</p>
+
+        <h2>Example of element</h2>
+        <code>
+            let element = { x: 0, y: 0, width: 2, height: 2 };
+            <br>//json: {"top":0,"left":0,"width":2,"height":2}
+        </code>
+    </div>
+
+    <h2>Demo</h2>
+    <div>
+        <div class="demo">
+            <div class="blocks__matrix">
+                <div id="canvas_parts" class="blocks"></div>
+            </div>
+        </div>
+
+
+        <h3>Module: Imagify</h3>
+        <div>
+            <p>
+                <label>
+                    AllPanels
+                    <input type="radio" name="imagify_mode" value="AllPanels" checked>
+                </label>
+                <label>
+                    EachPanel
+                    <input type="radio" name="imagify_mode" value="EachPanel">
+                </label>
+                <label>
+                    MultiplePanels
+                    <input type="radio" name="imagify_mode" value="MultiplePanels">
+                </label>
+            </p>
+            <input type="file" id="file-upload">
+        </div>
+
+
+        <link rel="stylesheet" href="modules/parts/script.css">
+        <link rel="stylesheet" href="modules/partsImagify/style.css">
+
+        <script src="index.js" type="module"></script>
+    </div>
+
+</body>
+
+</html>
