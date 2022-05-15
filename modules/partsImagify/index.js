@@ -3,166 +3,111 @@
 export class PartsImagify {
     constructor(cellPixelMultiplier = 100) {
         this.cellSize = cellPixelMultiplier;
-
-        //hidden container
-        this.hiddenContainer = document.createElement('div');
-        this.hiddenContainer.style = 'position:absolute;left:0;top:0;visibility:hidden;height:0;top:0;z-index:-99;';
-        document.body.append(this.hiddenContainer);
-
-        //canvas image upload
-        document.querySelector('#file-upload').addEventListener('change', (e) => {
-            var input = e.target, files = input.files;
-
-            // FileReader support
-            if (FileReader && files && files.length) {
-                var fr = new FileReader();
-                fr.onload = () => {
-                    this.image = fr.result;
-
-                    this.update();
-                }
-                fr.readAsDataURL(files[0]);
-            }
-        });
     }
 
-    afterInit(partsObj){
+    afterInit(partsObj) {
         this.partsObj = partsObj;
     }
 
-    beforeDraw(matrix) {
+    afterDraw(matrix) {
         this.matrix = matrix;
 
         this.matrix.forEach(item => {
+            let canvas = document.createElement('canvas');
+            canvas.id = `canvase_parts_imageify_${item.id}`;
+            canvas.width = item.width * this.cellSize;
+            canvas.height = item.height * this.cellSize;
+
             item.imagify = {
-                canvas: document.createElement('canvas')
+                canvas
             }
         })
     }
 
-    imagifyAfterPartImage(item){
-        item.el().append(item.imagify.canvas);
-    }
-
     set mode(value) {
-        this.selectedMode = value;
+        this._mode = value;
     }
     get mode() {
-        return this.selectedMode ? this.selectedMode : 'AllPanels';
+        return this._mode ? this._mode : 'cover_all';
     }
     set image(value) {
-        this.selectedImage = value;
+        this._image = value;
     }
     get image() {
-        return this.selectedImage ? this.selectedImage : null;
+        let imageTag = new Image();
+        imageTag.src = this._image;
+        return imageTag;
     }
-    modeAllPanels() {
-        if (this.image !== null) {
-            var cover = new Image();
-            cover.src = this.image;
-            cover.onload = () => {
 
-                //create matrix canvas
-                let canvasWidth = 0;
-                let canvasHeight = 0;
-
-                this.matrix.forEach(item => {
-                    canvasWidth = Math.max((item.x + item.width), canvasWidth);
-                    canvasHeight = Math.max((item.y + item.height), canvasHeight);
-                })
-
-                let canvas = document.createElement('canvas');
-                canvas.width = canvasWidth * this.cellSize;
-                canvas.height = canvasHeight * this.cellSize;
-                this.hiddenContainer.innerHTML = '';
-                this.hiddenContainer.append(canvas);
-
-                //draw image on all canvas
-                let matrixCTX = canvas.getContext("2d");
-                matrixCTX.drawImage(cover, 0, 0, canvas.width, canvas.height);
-
-                //crop canvas and update doors canvases
-                this.matrix.forEach(item => {
-
-                    //crop part
-                    var ImageData = matrixCTX.getImageData(
-                        item.x * this.cellSize,
-                        item.y * this.cellSize,
-                        item.width * this.cellSize,
-                        item.height * this.cellSize,
-                    );
-
-                    //update block canvas with new image part
-                    this.partsObj.applyFilter('imagifyBeforePartImage', item);
-
-                    item.imagify.canvas.getContext('2d').putImageData(ImageData, 0, 0);
-
-                    this.partsObj.applyFilter('imagifyAfterPartImage', item);
-                });
-            };
-        }
+    set fullCanvas(coverImage) {
+        let context = this.fullCanvas.getContext("2d");
+        context.clearRect(0, 0, this.fullCanvas.width, this.fullCanvas.height);
+        context.drawImage(coverImage, 0, 0, this.fullCanvas.width, this.fullCanvas.height);
     }
-    modeEachPanel() {
-        if (this.image !== null) {
-            var cover = new Image();
-            cover.src = this.image;
-            cover.onload = () => {
-                this.matrix.forEach(item => {
-                    item.canvas.getContext("2d").drawImage(cover, 0, 0, item.canvas.width, item.canvas.height);
-                })
+    get fullCanvas() {
+        if (this._fullCanvas === undefined) {
+            let canvasWidth = 0;
+            let canvasHeight = 0;
+            this.matrix.forEach(item => {
+                canvasWidth = Math.max((item.x + item.width), canvasWidth);
+                canvasHeight = Math.max((item.y + item.height), canvasHeight);
+            })
 
-                window.dispatchEvent(new Event('canvas_doors_need_update'));
-            };
+            this._fullCanvas = document.createElement('canvas');
+            this._fullCanvas.width = canvasWidth * this.cellSize;
+            this._fullCanvas.height = canvasHeight * this.cellSize;
         }
+
+        return this._fullCanvas;
     }
-    modeMultiplePanels() {
-        if (this.image !== null) {
-            var cover = new Image();
-            cover.src = this.image;
-            cover.onload = () => {
-                let matrix = this.matrix.filter(item => {
-                    return this.drawer.isActive(item.canvas.id);
-                });
 
-                //create matrix canvas
-                let canvasWidth = 0;
-                let canvasHeight = 0;
-                matrix.forEach(item => {
-                    canvasWidth = Math.max((item.x + item.width), canvasWidth);
-                    canvasHeight = Math.max((item.y + item.height), canvasHeight);
-                })
+    async coverItem(item) {
+        let rect = {};
+        rect.w = item.width * this.cellSize;
+        rect.h = item.height * this.cellSize;
+        rect.x = item.x * this.cellSize;
+        rect.y = this.fullCanvas.height + -(item.y * this.cellSize) + -rect.h;
+        rect = [rect.x, rect.y, rect.w, rect.h];
 
-                let canvas = document.createElement('canvas');
-                canvas.width = canvasWidth * this.cellSize;
-                canvas.height = canvasHeight * this.cellSize;
-                this.hiddenContainer.innerHTML = '';
-                this.hiddenContainer.append(canvas);
+        this.partsObj.applyFilter('imagifyBeforePartImage', item);
 
-                //draw image on all canvas
-                let matrixCTX = canvas.getContext("2d");
-                matrixCTX.drawImage(cover, 0, 0, canvas.width, canvas.height);
+        let context = item.imagify.canvas.getContext('2d');
+        context.clearRect(0, 0, item.imagify.canvas.width, item.imagify.canvas.height);
+        context.putImageData(this.fullCanvas.getContext("2d").getImageData(...rect), 0, 0);
 
-                //crop canvas and update doors canvases
-                matrix.forEach(item => {
+        this.partsObj.applyFilter('imagifyAfterPartImage', item);
+    }
+    async containItem(item) {
+        this.partsObj.applyFilter('imagifyBeforePartImage', item);
 
-                    //crop part
-                    var ImageData = matrixCTX.getImageData(
-                        item.x * this.cellSize,
-                        item.y * this.cellSize,
-                        item.width * this.cellSize,
-                        item.height * this.cellSize,
-                    );
+        let canvas = item.imagify.canvas;
+        var ratio = Math.min(
+            canvas.width / this.fullCanvas.width,
+            canvas.height / this.fullCanvas.height
+        );
+        canvas.getContext('2d').drawImage(this.fullCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height, 0, 0, this.fullCanvas.width * ratio, this.fullCanvas.height * ratio);
 
-                    //update block canvas with new image part
-                    item.canvas.getContext('2d').putImageData(ImageData, 0, 0);
-                });
-
-                window.dispatchEvent(new Event('canvas_doors_need_update'));
-            };
-        }
+        this.partsObj.applyFilter('imagifyAfterPartImage', item);
     }
 
     update() {
-        this[`mode${this.mode}`](); //apply mode
+        this.partsObj.applyFilter('imagifyBeforeUpdate', this.matrix);
+        this.image.onload = () => {
+            this.fullCanvas = this.image;
+
+            let method = 'contain';
+            method = this.mode.includes('cover') ? 'cover' : method;
+
+            for (let i = 0; i < this.matrix.length; i++) {
+                let item = this.matrix[i];
+
+                if (this.mode.includes('selected') && !item.el().classList.contains('active')) {
+                    break;
+                 }
+
+                this[`${method}Item`](item);
+            }
+        }
+        this.partsObj.applyFilter('imagifyAfterUpdate', this.matrix);
     }
 }

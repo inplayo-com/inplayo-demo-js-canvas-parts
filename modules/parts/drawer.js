@@ -23,11 +23,9 @@ export class Drawer {
     }
     listeners() {
         this.container.addEventListener('click', (e) => {
-            let item = e.target;
-            if (item.classList.contains('blocks__item')) {
-                item.classList.toggle('active');
-
-                window.dispatchEvent(new Event('canvas_doors_matrix_active_changed'));
+            let blockContainer = e.target.closest('.blocks__item');
+            if (blockContainer !== null) {
+                blockContainer.classList.toggle('active');
             }
         })
     }

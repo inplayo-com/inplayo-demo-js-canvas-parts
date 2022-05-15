@@ -39,24 +39,42 @@
             </div>
         </div>
 
-
         <h3>Module: Imagify</h3>
+
+        <h4>Modes</h4>
         <div>
-            <p>
-                <label>
-                    AllPanels
-                    <input type="radio" name="imagify_mode" value="AllPanels" checked>
-                </label>
-                <label>
-                    EachPanel
-                    <input type="radio" name="imagify_mode" value="EachPanel">
-                </label>
-                <label>
-                    MultiplePanels
-                    <input type="radio" name="imagify_mode" value="MultiplePanels">
-                </label>
-            </p>
+            <label>
+                <input type="radio" name="imagify_mode" value="cover_all" checked>
+                Cover All - image would be cropped according to parts coords and sizes, parts will be filled with
+                cropped fragments of image
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="imagify_mode" value="cover_selected">
+                Cover Selected - image would be cropped according to selected parts coords and sizes, selected parts
+                will be filled with cropped fragments of image
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="imagify_mode" value="contain_all">
+                Contain All - each part would be filled with full image
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="imagify_mode" value="contain_selected">
+                Contain Selected - selected parts would be filled with full image
+            </label>
+        </div>
+        
+        <h4>File</h4>
+        <div>
             <input type="file" id="file-upload">
+            <button id="imagify_update">Update using mode & image</button>
+            <button id="imagify_select_all">select all parts</button>
+            <button id="imagify_deselect_all">deselect all parts</button>
         </div>
 
 

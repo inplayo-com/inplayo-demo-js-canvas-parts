@@ -7,7 +7,7 @@ export class Parts {
         this.extensions = extensions;
 
         this.drawer = new Drawer(this);
-        
+
         this.applyFilter('afterInit', this);
     }
 
@@ -16,7 +16,7 @@ export class Parts {
         return window.uniqIdLast += 1;
     }
 
-    create(parts){
+    create(parts) {
         this.matrix = parts;
 
         this.applyFilter('beforeDraw', this.matrix);
@@ -28,8 +28,6 @@ export class Parts {
         this.drawer.update(this.matrix);
 
         this.applyFilter('afterDraw', this.matrix);
-
-        console.log(this.matrix);
     }
 
     get matrix() {
@@ -43,7 +41,7 @@ export class Parts {
     }
 
     //extension actions
-    applyFilter(filterName, ...args){
+    applyFilter(filterName, ...args) {
         this.extensions.forEach(module => {
             module[filterName] ? module[filterName](...args) : '';
         });
