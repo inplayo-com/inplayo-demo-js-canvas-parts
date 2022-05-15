@@ -85,7 +85,10 @@ export class PartsImagify {
             canvas.width / this.fullCanvas.width,
             canvas.height / this.fullCanvas.height
         );
-        canvas.getContext('2d').drawImage(this.fullCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height, 0, 0, this.fullCanvas.width * ratio, this.fullCanvas.height * ratio);
+
+        let context = canvas.getContext('2d');
+        context.clearRect(0, 0, item.imagify.canvas.width, item.imagify.canvas.height);
+        context.drawImage(this.fullCanvas, 0, 0, this.fullCanvas.width, this.fullCanvas.height, 0, 0, this.fullCanvas.width * ratio, this.fullCanvas.height * ratio);
 
         this.partsObj.applyFilter('imagifyAfterPartImage', item);
     }
@@ -102,7 +105,7 @@ export class PartsImagify {
                 let item = this.matrix[i];
 
                 if (this.mode.includes('selected') && !item.el().classList.contains('active')) {
-                    break;
+                    continue;
                  }
 
                 this[`${method}Item`](item);
